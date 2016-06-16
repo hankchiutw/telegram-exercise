@@ -7,9 +7,9 @@ const co = require('co');
  */
 
 module.exports = function(app){
-    const prefix = 'common';
+    const prefix = 'hko';
     const map = {
-        start
+        tellme
     };
 
     /**
@@ -26,6 +26,8 @@ module.exports = function(app){
  * Implements
  */
 
-function *start($){
-    $.sendMessage('ok!');
+function *tellme($){
+    console.log('tellme:', $.args);
+
+    $.sendMessage($.args+' feed:');
 }

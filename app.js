@@ -5,7 +5,8 @@
  */
 
 try{
-    const app = require('telegram-node-bot')('209018537:AAELoaUjVWGbk9MPUys63xLlHX2-X_pWi0Q');
+    const botToken = require('config/config').botToken;
+    const app = require('telegram-node-bot')(botToken);
     require('config/routes')(app);
 
     console.log('Service started.');
