@@ -1,0 +1,14 @@
+{
+  "apps" : [
+    {
+      "name": "telegram-exercise",
+      "script": "app.js",
+      "node_args": "--harmony",
+      "watch": ["app", "config", "lib", "app.js", "*.json", "modules", "test-runner.js", "test/*.js"],
+      "ignore_watch": ["[\\/\\\\]\\./", "node_modules", "./**/.*", "*.log"],
+      "env": {
+        "NODE_PATH": "."
+      }
+    }
+  ]
+}
