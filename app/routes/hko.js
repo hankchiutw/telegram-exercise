@@ -9,6 +9,7 @@ module.exports = function(app){
 
     const map = {
         'hko.topics': ['topics'],
+        'hko.locale': ['locale'],
         'hko.tellmeCurrentWeather': ['tellme c', 'tellme current', 'tellme CurrentWeather'],
         'hko.tellmeWeatherWarning': ['tellme w', 'tellme warning', 'tellme WeatherWarning']
     };

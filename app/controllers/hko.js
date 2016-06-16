@@ -13,6 +13,7 @@ module.exports = function(app){
     const prefix = 'hko';
     const map = {
         topics,
+        locale,
         tellmeCurrentWeather,
         tellmeWeatherWarning
     };
@@ -33,6 +34,13 @@ module.exports = function(app){
 
 function *topics($){
     $.sendMessage(`Supported topics: ${TOPICS}`);
+}
+
+function *locale($){
+    if(['en', 'tc', 'sc'].indexOf($.args) < 0) currentLocaleMap[$.chatId] = 'en';
+    else currentLocaleMap[$.chatId] = $.args;
+
+    $.sendMessage('Locale was set to '+ currentLocaleMap[$.chatId]);
 }
 
 function *tellmeCurrentWeather($){
