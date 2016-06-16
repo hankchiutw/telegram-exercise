@@ -1,6 +1,6 @@
 'use strict';
 
-const TOPICS = require('config/config').topics;
+const validTopics = require('config/config').validTopics;
 const currentLocaleMap = require('config/config').currentLocaleMap;
 
 
@@ -17,10 +17,12 @@ module.exports = function(app){
     const map = {
         topics,
         locale,
-        tellmeCurrentWeather,
-        tellmeWeatherWarning,
-        subscribeWeatherWarning,
-        unsubscribeWeatherWarning
+        tellmeCurrentWeather: _builder(_tellme, 'CurrentWeather'),
+        tellmeWeatherWarning: _builder(_tellme, 'WeatherWarning'),
+        subscribeCurrentWeather: _builder(_subscribe, 'CurrentWeather'),
+        unsubscribeCurrentWeather: _builder(_unsubscribe, 'CurrentWeather'),
+        subscribeWeatherWarning: _builder(_subscribe, 'WeatherWarning'),
+        unsubscribeWeatherWarning: _builder(_unsubscribe, 'WeatherWarning')
     };
 
     /**
@@ -38,7 +40,7 @@ module.exports = function(app){
  */
 
 function *topics($){
-    $.sendMessage(`Supported topics: ${TOPICS}`);
+    $.sendMessage(`Supported topics: ${validTopics}`);
 }
 
 function *locale($){
@@ -48,45 +50,36 @@ function *locale($){
     $.sendMessage('Locale was set to '+ currentLocaleMap[$.chatId]);
 }
 
-function *tellmeCurrentWeather($){
-    $.args = 'CurrentWeather';
-    yield _tellme($);
-}
-
-function *tellmeWeatherWarning($){
-    $.args = 'WeatherWarning';
-    yield _tellme($);
-}
-
-function *subscribeWeatherWarning($){
-    $.args = 'WeatherWarning';
-    yield _subscribe($);
-}
-
-function *unsubscribeWeatherWarning($){
-    $.args = 'WeatherWarning';
-    yield _unsubscribe($);
-}
-
 /**
  * Private implements
  */
 
+/**
+ * Build a controller as an ES6 genderator
+ */
+function _builder(callback, modelName){
+    return function*($){
+        $.args = modelName;
+        yield callback($);
+    };
+}
+
 function *_tellme($){
     console.log('[tellme] topic:', $.args);
-    if(TOPICS.indexOf($.args) < 0) return $.sendMessage('topic not existed.');
+    if(validTopics.indexOf($.args) < 0) return $.sendMessage('topic not existed.');
     if(!currentLocaleMap[$.chatId]) currentLocaleMap[$.chatId] = 'en';
 
     const locale = currentLocaleMap[$.chatId];
     const TopicModel = require('app/models/'+$.args);
-    const ret = yield TopicModel.fetch(locale);
+    //const ret = yield TopicModel.fetch(locale);
+    const ret = TopicModel.cache[locale].text;
 
     $.sendMessage(ret);
 }
 
 function *_subscribe($){
     console.log('[subscribe] topic:', $.args);
-    if(TOPICS.indexOf($.args) < 0) return $.sendMessage('topic not existed.');
+    if(validTopics.indexOf($.args) < 0) return $.sendMessage('topic not existed.');
     if(!currentLocaleMap[$.chatId]) currentLocaleMap[$.chatId] = 'en';
 
     const locale = currentLocaleMap[$.chatId];
@@ -99,7 +92,7 @@ function *_subscribe($){
 
 function *_unsubscribe($){
     console.log('[unsubscribe] topic:', $.args);
-    if(TOPICS.indexOf($.args) < 0) return $.sendMessage('topic not existed.');
+    if(validTopics.indexOf($.args) < 0) return $.sendMessage('topic not existed.');
     if(!currentLocaleMap[$.chatId]) currentLocaleMap[$.chatId] = 'en';
 
     const TopicModel = require('app/models/'+$.args);

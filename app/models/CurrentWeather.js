@@ -1,29 +1,28 @@
 "use strict";
 /** @module CurrentWeather */
 
-const request = require('co-request');
-const parser = require('xml2json');
 const cheerio = require('cheerio');
+const BaseModel = require('./BaseModel');
 
-function Model(){
+let Model = new BaseModel();
 
-}
-
+Model.name = 'CurrentWeather';
 Model.uriMap = {
     en: 'http://rss.weather.gov.hk/rss/CurrentWeather.xml',
     tc: 'http://rss.weather.gov.hk/rss/CurrentWeather_uc.xml',
     sc: 'http://gbrss.weather.gov.hk/rss/CurrentWeather_uc.xml'
 };
 
-Model.fetch = function *(locale){
-    const uri = Model.uriMap[locale];
-    const result = yield request(uri);
-    const json = parser.toJson(result.body, {object: true});
+Model.transformer = function(json){
+    let ret = {};
     const node = cheerio.load('<div>'+json.rss.channel.item.description.toString()+'</div>');
-    const ret = node('div').text();
+    ret.text = node('div p').text();
+    ret.cache = {
+        pubDate: json.rss.channel.item.guid.pubDate,
+        text: ret.text
+    };
 
     return ret;
 };
-
 
 module.exports = Model;

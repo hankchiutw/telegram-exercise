@@ -1,29 +1,33 @@
 'use strict';
 
 const co = require('co');
+const validTopics = require('config/config').validTopics;
 const syncPeriod = require('config/config').syncPeriod;
 
 module.exports = function (app){
     console.log('Config storage ...');
 
-    const WeatherWarning = require('app/models/WeatherWarning');
+    validTopics.forEach(function(topic){
+        const TopicModel = require('app/models/'+topic);
 
-    // periodically sync local storage
-    setInterval(co.wrap(function *(){
-        console.log('[storage] sync remote:');
-        yield WeatherWarning.fetch('en');
+        // periodically sync local storage
+        setInterval(co.wrap(function *(){
+            console.log('[storage] sync remote:');
+            yield TopicModel.fetch('en');
 
-        if(!WeatherWarning.hasNewer) return;
+            if(!TopicModel.hasNewer) return;
 
-        yield WeatherWarning.fetch('tc');
-        yield WeatherWarning.fetch('sc');
+            yield TopicModel.fetch('tc');
+            yield TopicModel.fetch('sc');
 
-        // inform subscribers
-        Object.keys(WeatherWarning.subscribers).forEach(function(id){
-            const locale = WeatherWarning.subscribers[id].locale;
-            app.sendMessage(id, '[!!!NEW WARNING!!!]\n'+WeatherWarning.cache[locale].text);
-        });
+            // inform subscribers
+            const ids = Object.keys(TopicModel.subscribers);
+            ids.forEach(function(id){
+                const locale = TopicModel.subscribers[id].locale;
+                app.sendMessage(id, `[!!!NEW UPDATE!!!](${TopicModel.name})\n${TopicModel.cache[locale].text}`);
+            });
 
-    }), syncPeriod);
+        }), syncPeriod);
+    });
 
 };
