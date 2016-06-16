@@ -71,7 +71,10 @@ function *_tellme($){
 
     const locale = currentLocaleMap[$.chatId];
     const TopicModel = require('app/models/'+$.args);
-    //const ret = yield TopicModel.fetch(locale);
+    
+    // do query for better accuracy
+    yield TopicModel.fetch(locale);
+    
     const ret = TopicModel.cache[locale].text;
 
     $.sendMessage(ret);

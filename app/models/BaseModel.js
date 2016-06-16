@@ -42,8 +42,7 @@ Model.prototype.fetch = function *(locale){
 
     this.cache[locale] = ret.cache;
 
-
-    return ret.output;
+    return ret.text;
 };
 
 module.exports = Model;
