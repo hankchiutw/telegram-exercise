@@ -1,7 +1,9 @@
 'use strict';
 
-const co = require('co');
 const TOPICS = require('config/config').topics;
+const currentLocaleMap = require('config/config').currentLocaleMap;
+
+const co = require('co');
 
 /**
  * Expose
@@ -33,7 +35,14 @@ function *topics($){
 }
 
 function *tellme($){
-    console.log('tellme:', $.args);
+    console.log('[tellme] topic:', $.args);
+    if(TOPICS.indexOf($.args) < 0) return $.sendMessage('topic not existed.');
+    if(!currentLocaleMap[$.chatId]) currentLocaleMap[$.chatId] = 'en';
 
-    $.sendMessage($.args+' feed:');
+    const locale = currentLocaleMap[$.chatId];
+    const TopicModel = require('app/models/'+$.args);
+    const ret = yield TopicModel.fetch(locale);
+
+    console.log('[tellme] ret:', ret);
+    $.sendMessage(ret);
 }
