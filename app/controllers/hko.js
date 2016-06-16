@@ -1,6 +1,7 @@
 'use strict';
 
 const co = require('co');
+const TOPICS = require('config/config').topics;
 
 /**
  * Expose
@@ -9,6 +10,7 @@ const co = require('co');
 module.exports = function(app){
     const prefix = 'hko';
     const map = {
+        topics,
         tellme
     };
 
@@ -25,6 +27,10 @@ module.exports = function(app){
 /**
  * Implements
  */
+
+function *topics($){
+    $.sendMessage(`Supported topics: ${TOPICS}`);
+}
 
 function *tellme($){
     console.log('tellme:', $.args);

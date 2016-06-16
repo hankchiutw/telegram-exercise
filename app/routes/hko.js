@@ -8,6 +8,7 @@ module.exports = function(app){
     require('app/controllers/hko')(app);
 
     const map = {
+        'hko.topics': ['topics'],
         'hko.tellme': ['tellme']
     };
 
