@@ -13,7 +13,8 @@ module.exports = function(app){
     const prefix = 'hko';
     const map = {
         topics,
-        tellme
+        tellmeCurrentWeather,
+        tellmeWeatherWarning
     };
 
     /**
@@ -34,7 +35,17 @@ function *topics($){
     $.sendMessage(`Supported topics: ${TOPICS}`);
 }
 
-function *tellme($){
+function *tellmeCurrentWeather($){
+    $.args = 'CurrentWeather';
+    yield _tellme($);
+}
+
+function *tellmeWeatherWarning($){
+    $.args = 'WeatherWarning';
+    yield _tellme($);
+}
+
+function *_tellme($){
     console.log('[tellme] topic:', $.args);
     if(TOPICS.indexOf($.args) < 0) return $.sendMessage('topic not existed.');
     if(!currentLocaleMap[$.chatId]) currentLocaleMap[$.chatId] = 'en';
@@ -46,3 +57,4 @@ function *tellme($){
     console.log('[tellme] ret:', ret);
     $.sendMessage(ret);
 }
+
